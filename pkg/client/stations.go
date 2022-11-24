@@ -2,7 +2,9 @@ package client
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"strconv"
 )
 
 type Station struct {
@@ -52,4 +54,24 @@ func (w *weatherlink) Stations() ([]Station, error) {
 		return []Station{}, err
 	}
 	return data.Stations, nil
+}
+
+func (w *weatherlink) Station(stationId int32) (Station, error) {
+	nodeIdString := strconv.Itoa(int(stationId))
+	path := fmt.Sprintf("stations/%s", nodeIdString)
+	url, err := w.url(path, map[string]string{"station-ids": nodeIdString})
+	if err != nil {
+		return Station{}, err
+	}
+	resp, err := w.client.Get(url)
+	result, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Station{}, err
+	}
+	var data Stations
+	err = json.Unmarshal(result, &data)
+	if err != nil {
+		return Station{}, err
+	}
+	return data.Stations[0], nil
 }
