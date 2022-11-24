@@ -37,7 +37,7 @@ type Stations struct {
 }
 
 func (w *weatherlink) Stations() ([]Station, error) {
-	url, err := w.url("stations")
+	url, err := w.url("stations", nil)
 	if err != nil {
 		return []Station{}, err
 	}

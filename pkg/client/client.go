@@ -4,10 +4,10 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -31,24 +31,30 @@ func New(client *http.Client, apiKey, apiSecret string) *weatherlink {
 	}
 }
 
-func (w *weatherlink) signature() (int64, string) {
-	timestamp := time.Now().Unix()
+func (w *weatherlink) signature(values url.Values) url.Values {
 	sign := hmac.New(sha256.New, []byte(w.ApiSecret))
-	sign.Write([]byte(fmt.Sprintf("api-key%st%d", w.ApiKey, timestamp)))
-	return timestamp, hex.EncodeToString(sign.Sum(nil))
+	timestamp := time.Now().Unix()
+	values.Set("t", strconv.FormatInt(timestamp, 10))
+	cleanValues := strings.ReplaceAll(values.Encode(), "=", "")
+	cleanValues = strings.ReplaceAll(cleanValues, "&", "")
+	sign.Write([]byte(cleanValues))
+	encodedSign := hex.EncodeToString(sign.Sum(nil))
+	values.Set("api-signature", encodedSign)
+	return values
 }
 
-func (w *weatherlink) url(path string) (string, error) {
+func (w *weatherlink) url(path string, extraParams map[string]string) (string, error) {
 	parsed, err := url.Parse(ApiV2Url)
 	if err != nil {
 		return "", err
 	}
-	timestamp, sign := w.signature()
+	joined := parsed.JoinPath(path)
 	params := parsed.Query()
 	params.Set("api-key", w.ApiKey)
-	params.Set("api-signature", sign)
-	params.Set("t", strconv.FormatInt(timestamp, 10))
-	parsed.RawQuery = params.Encode()
-	fullUrl := parsed.JoinPath(path)
-	return fullUrl.String(), err
+	for key, value := range extraParams {
+		params.Set(key, value)
+	}
+	signedUrl := w.signature(params)
+	joined.RawQuery = signedUrl.Encode()
+	return joined.String(), err
 }
