@@ -57,9 +57,9 @@ func (w *weatherlink) Stations() ([]Station, error) {
 }
 
 func (w *weatherlink) Station(stationId int32) (Station, error) {
-	nodeIdString := strconv.Itoa(int(stationId))
-	path := fmt.Sprintf("stations/%s", nodeIdString)
-	url, err := w.url(path, map[string]string{"station-ids": nodeIdString})
+	stationIdString := strconv.Itoa(int(stationId))
+	path := fmt.Sprintf("stations/%s", stationIdString)
+	url, err := w.url(path, map[string]string{"station-ids": stationIdString})
 	if err != nil {
 		return Station{}, err
 	}
