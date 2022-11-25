@@ -8,7 +8,7 @@ import (
 )
 
 type Sensor struct {
-	Lsid             int32   `json:"lsid"`
+	LsId             int32   `json:"lsid"`
 	SensorType       int32   `json:"sensor_type"`
 	Category         string  `json:"category"`
 	Manufacturer     string  `json:"manufacturer"`
