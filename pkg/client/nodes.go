@@ -28,7 +28,7 @@ type Nodes struct {
 }
 
 func (w *weatherlink) Nodes() ([]Node, error) {
-	url, err := w.url("nodes", nil)
+	url, err := w.url("nodes", nil, true)
 	if err != nil {
 		return []Node{}, err
 	}
@@ -48,7 +48,7 @@ func (w *weatherlink) Nodes() ([]Node, error) {
 func (w *weatherlink) Node(nodeId int32) (Node, error) {
 	nodeIdString := strconv.Itoa(int(nodeId))
 	path := fmt.Sprintf("nodes/%s", nodeIdString)
-	url, err := w.url(path, map[string]string{"node-ids": nodeIdString})
+	url, err := w.url(path, map[string]string{"node-ids": nodeIdString}, true)
 	if err != nil {
 		return Node{}, err
 	}

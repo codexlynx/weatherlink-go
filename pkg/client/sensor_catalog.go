@@ -18,7 +18,7 @@ type SensorCatalog struct {
 }
 
 func (w *weatherlink) SensorCatalog() ([]SensorType, error) {
-	url, err := w.url("sensor-catalog", nil)
+	url, err := w.url("sensor-catalog", nil, true)
 	if err != nil {
 		return []SensorType{}, err
 	}

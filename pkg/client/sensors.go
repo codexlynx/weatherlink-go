@@ -35,7 +35,7 @@ type Sensors struct {
 }
 
 func (w *weatherlink) Sensors() ([]Sensor, error) {
-	url, err := w.url("sensors", nil)
+	url, err := w.url("sensors", nil, true)
 	if err != nil {
 		return []Sensor{}, err
 	}
@@ -55,7 +55,7 @@ func (w *weatherlink) Sensors() ([]Sensor, error) {
 func (w *weatherlink) Sensor(lsId int32) (Sensor, error) {
 	lsIdString := strconv.Itoa(int(lsId))
 	path := fmt.Sprintf("sensors/%s", lsIdString)
-	url, err := w.url(path, map[string]string{"sensor-ids": lsIdString})
+	url, err := w.url(path, map[string]string{"sensor-ids": lsIdString}, true)
 	if err != nil {
 		return Sensor{}, err
 	}
