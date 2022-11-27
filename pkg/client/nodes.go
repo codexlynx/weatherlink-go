@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"strconv"
 )
 
@@ -28,12 +27,7 @@ type Nodes struct {
 }
 
 func (w *weatherlink) Nodes() ([]Node, error) {
-	url, err := w.url("nodes", nil, true)
-	if err != nil {
-		return []Node{}, err
-	}
-	resp, err := w.client.Get(url)
-	result, err := io.ReadAll(resp.Body)
+	result, err := w.get("nodes", nil, true)
 	if err != nil {
 		return []Node{}, err
 	}
@@ -48,12 +42,7 @@ func (w *weatherlink) Nodes() ([]Node, error) {
 func (w *weatherlink) Node(nodeId int32) (Node, error) {
 	nodeIdString := strconv.Itoa(int(nodeId))
 	path := fmt.Sprintf("nodes/%s", nodeIdString)
-	url, err := w.url(path, map[string]string{"node-ids": nodeIdString}, true)
-	if err != nil {
-		return Node{}, err
-	}
-	resp, err := w.client.Get(url)
-	result, err := io.ReadAll(resp.Body)
+	result, err := w.get(path, map[string]string{"node-ids": nodeIdString}, true)
 	if err != nil {
 		return Node{}, err
 	}

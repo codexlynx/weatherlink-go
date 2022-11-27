@@ -2,7 +2,6 @@ package client
 
 import (
 	"encoding/json"
-	"io"
 )
 
 type SensorType struct {
@@ -18,12 +17,7 @@ type SensorCatalog struct {
 }
 
 func (w *weatherlink) SensorCatalog() ([]SensorType, error) {
-	url, err := w.url("sensor-catalog", nil, true)
-	if err != nil {
-		return []SensorType{}, err
-	}
-	resp, err := w.client.Get(url)
-	result, err := io.ReadAll(resp.Body)
+	result, err := w.get("sensor-catalog", nil, true)
 	if err != nil {
 		return []SensorType{}, err
 	}

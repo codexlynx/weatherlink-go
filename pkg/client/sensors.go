@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"strconv"
 )
 
@@ -35,12 +34,7 @@ type Sensors struct {
 }
 
 func (w *weatherlink) Sensors() ([]Sensor, error) {
-	url, err := w.url("sensors", nil, true)
-	if err != nil {
-		return []Sensor{}, err
-	}
-	resp, err := w.client.Get(url)
-	result, err := io.ReadAll(resp.Body)
+	result, err := w.get("sensors", nil, true)
 	if err != nil {
 		return []Sensor{}, err
 	}
@@ -55,12 +49,7 @@ func (w *weatherlink) Sensors() ([]Sensor, error) {
 func (w *weatherlink) Sensor(lsId int32) (Sensor, error) {
 	lsIdString := strconv.Itoa(int(lsId))
 	path := fmt.Sprintf("sensors/%s", lsIdString)
-	url, err := w.url(path, map[string]string{"sensor-ids": lsIdString}, true)
-	if err != nil {
-		return Sensor{}, err
-	}
-	resp, err := w.client.Get(url)
-	result, err := io.ReadAll(resp.Body)
+	result, err := w.get(path, map[string]string{"sensor-ids": lsIdString}, true)
 	if err != nil {
 		return Sensor{}, err
 	}

@@ -3,7 +3,6 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"strconv"
 )
 
@@ -23,12 +22,10 @@ type Current struct {
 func (w *weatherlink) Current(stationId int32) ([]CurrentSensor, error) {
 	stationIdString := strconv.Itoa(int(stationId))
 	path := fmt.Sprintf("current/%s", stationIdString)
-	url, err := w.url(path, map[string]string{"station-id": stationIdString}, false)
+	result, err := w.get(path, map[string]string{"station-id": stationIdString}, false)
 	if err != nil {
 		return []CurrentSensor{}, err
 	}
-	resp, err := w.client.Get(url)
-	result, err := io.ReadAll(resp.Body)
 	var data Current
 	err = json.Unmarshal(result, &data)
 	if err != nil {

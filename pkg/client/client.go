@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -42,10 +43,10 @@ func (w *weatherlink) signature(values url.Values) url.Values {
 	return values
 }
 
-func (w *weatherlink) url(path string, extra map[string]string, includeExtra bool) (string, error) {
+func (w *weatherlink) get(path string, extra map[string]string, includeExtra bool) ([]byte, error) {
 	parsed, err := url.Parse(ApiV2Url)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 	joined := parsed.JoinPath(path)
 	params := parsed.Query()
@@ -59,5 +60,13 @@ func (w *weatherlink) url(path string, extra map[string]string, includeExtra boo
 		signedUrl = util.RemoveParameters(keys, signedUrl)
 	}
 	joined.RawQuery = signedUrl.Encode()
-	return joined.String(), err
+	resp, err := w.client.Get(joined.String())
+	if err != nil {
+		return []byte{}, err
+	}
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return []byte{}, err
+	}
+	return data, err
 }
